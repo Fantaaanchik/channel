@@ -1,0 +1,5 @@
+{
+  "server_name":"localhost",
+  "port_run": ":8000",
+  "db" : "host=localhost user=postgres password=admin dbname=postgres port=5432 sslmode=disable"
+}
