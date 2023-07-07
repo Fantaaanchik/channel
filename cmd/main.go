@@ -24,37 +24,26 @@ func main() {
 	cardChan := make(chan models.Card)
 
 	rowsAffectedChan := make(chan int64, 100)
-	sumOfAttempts := 0
 	go func() {
 		defer close(cardChan)
 		err := db.GetDB().FindInBatches(&cards, 100, func(tx *gorm.DB, batch int) error {
+			fmt.Println("batch", batch)
 			for _, result := range cards {
-				if result.Id >= 100 && result.Id <= 300 {
+				if result.Id >= 1 && result.Id <= 500 {
 					cardChan <- result
-				}
-
-				if len(cardChan) == 100 {
-
 				}
 			}
 
 			rowsAffected := tx.RowsAffected
-			for i := 1; i <= 100; i++ {
-				rowsAffectedChan <- rowsAffected
-			}
-			sumOfAttempts++
-			fmt.Println("sumOfAttempts", sumOfAttempts)
+			fmt.Println("rowsAffected", rowsAffected)
 
 			tx.Save(&cards)
 
 			return nil
 		})
-
 		if err != nil {
-			fmt.Println("Error: ", err)
+			log.Println("ERROR: ", err)
 		}
-
-		close(rowsAffectedChan)
 	}()
 	fmt.Println("--------------------------------------------------------------------------------------")
 	for card := range cardChan {
@@ -63,7 +52,7 @@ func main() {
 
 		fmt.Println(card)
 	}
-	close(cardChan)
+	//close(cardChan)
 
 	totalRowsAffected := int64(0)
 
